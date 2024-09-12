@@ -429,7 +429,7 @@ func (r *RateLimitServiceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 
 		log.Info("reload statsd exporter")
-		err = reloadStatsdExporter(fmt.Sprintf("%s.%s.svc.cluster.local", svc.Name, svc.Namespace))
+		err = reloadStatsdExporter(fmt.Sprintf("%s.%s.svc", svc.Name, svc.Namespace))
 		if err != nil {
 			return ctrl.Result{}, err
 		}

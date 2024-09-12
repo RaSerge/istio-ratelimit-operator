@@ -66,6 +66,9 @@ type GlobalRateLimitConfigRatelimitSpecService struct {
 	Name    string        `json:"name,omitempty"`
 	Address string        `json:"address,omitempty"`
 	Port    int           `json:"port,omitempty"`
+	// +kubebuilder:default=cluster.local
+	// +optional
+	Domain	string			`json:"domain,omitempty"`
 }
 
 // GlobalRateLimitConfigStatus defines the observed state of GlobalRateLimitConfig
