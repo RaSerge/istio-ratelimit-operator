@@ -48,6 +48,9 @@ spec:
                         properties:
                           address:
                             type: string
+                          domain:
+                            default: cluster.local
+                            type: string
                           name:
                             type: string
                           port:

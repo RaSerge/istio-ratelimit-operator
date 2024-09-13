@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.0
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: globalratelimitconfigs.ratelimit.zufardhiyaulhaq.com
 spec:
@@ -48,6 +48,9 @@ spec:
                       service:
                         properties:
                           address:
+                            type: string
+                          domain:
+                            default: cluster.local
                             type: string
                           name:
                             type: string
@@ -112,7 +115,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.0
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: globalratelimits.ratelimit.zufardhiyaulhaq.com
 spec:
@@ -448,7 +451,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.0
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: localratelimitconfigs.ratelimit.zufardhiyaulhaq.com
 spec:
@@ -520,7 +523,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.0
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: localratelimits.ratelimit.zufardhiyaulhaq.com
 spec:

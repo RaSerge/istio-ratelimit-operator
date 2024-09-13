@@ -176,10 +176,21 @@ $(LOCALBIN):
 KUSTOMIZE ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
+HELM_DOCS ?= $(LOCALBIN)/helm-docs
+OPERATOR_SDK ?= $(LOCALBIN)/operator-sdk
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
 CONTROLLER_TOOLS_VERSION ?= v0.11.3
+HELM_DOCS_VERSION ?= v1.12.0
+OPERATOR_SDK_VERSION ?= v1.11.0
+
+OPERATOR_SDK_DL_URL ?= "https://github.com/operator-framework/operator-sdk/releases/download/$(OPERATOR_SDK_VERSION)/operator-sdk_linux_amd64"
+.PHONY: operator-sdk
+operator-sdk: $(OPERATOR_SDK) ## Download operator-sdk locally if necessary.
+$(OPERATOR_SDK): $(LOCALBIN)
+	test -s $(LOCALBIN)/operator-sdk && $(LOCALBIN)/operator-sdk version | grep -q $(OPERATOR_SDK_VERSION) || \
+  curl -L ${OPERATOR_SDK_DL_URL} --output $(LOCALBIN)/operator-sdk && chmod +x $(LOCALBIN)/operator-sdk
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -198,12 +209,19 @@ envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
 	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
+.PHONY: helm-docs
+helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
+$(HELM_DOCS): $(LOCALBIN)
+	test -s $(LOCALBIN)/helm-docs && $(LOCALBIN)/helm-docs --version | grep -q $(HELM_DOCS_VERSION) || \
+  GOBIN=$(LOCALBIN) go install github.com/norwoodj/helm-docs/cmd/helm-docs@$(HELM_DOCS_VERSION)
+
+
 .PHONY: bundle
 bundle: manifests kustomize ## Generate bundle manifests and metadata, then validate generated files.
-	operator-sdk generate kustomize manifests -q
+	$(LOCALBIN)/operator-sdk generate kustomize manifests -q
 	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
-	$(KUSTOMIZE) build config/manifests | operator-sdk generate bundle $(BUNDLE_GEN_FLAGS)
-	operator-sdk bundle validate ./bundle
+	$(KUSTOMIZE) build config/manifests | $(LOCALBIN)/operator-sdk generate bundle $(BUNDLE_GEN_FLAGS)
+	$(LOCALBIN)/operator-sdk bundle validate ./bundle
 
 .PHONY: bundle-build
 bundle-build: ## Build the bundle image.
@@ -260,8 +278,8 @@ catalog-push: ## Push a catalog image.
 
 .PHONY: readme
 readme:
-	helm-docs -c ./charts/istio-ratelimit-operator -d > README.md
-	helm-docs -c ./charts/istio-ratelimit-operator
+	$(LOCALBIN)/helm-docs -c ./charts/istio-ratelimit-operator -d > README.md
+	$(LOCALBIN)/helm-docs -c ./charts/istio-ratelimit-operator
 
 .PHONY: helm.create.releases
 helm.create.releases:
@@ -269,7 +287,7 @@ helm.create.releases:
 	helm repo index charts/releases
 
 .PHONY: lint
-lint: 
+lint:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1
 	golangci-lint run --verbose --timeout 300s
 
